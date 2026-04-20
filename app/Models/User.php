@@ -17,6 +17,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasApiTokens, Notifiable;
+    protected $table = 'users';
 
     /**
      * Get the attributes that should be cast.
@@ -29,5 +30,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function businesses()
+    {
+        return $this->hasMany(Business::class);
     }
 }
