@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Dashboard</title>
@@ -9,21 +10,63 @@
 
 <div class="container mt-4">
 
-    <div class="d-flex justify-content-between">
-    <h3>My Businesses</h3>
-        <form method="POST" action="/business">
-        @csrf
-            <button class="btn btn-danger">Add Business</button>
-        </form>
+<!-- CENTER -->
+    <div class="text-center flex-grow-1">
+        <h3 class="mb-0">My Businesses</h3>
+    </div>
 
+<!-- TOP BAR -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+
+    <!-- LEFT -->
+    <div>
+        <a href="/addBusinessDetails" class="btn btn-primary">
+            + Add Business
+        </a>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
         <form method="POST" action="/logout">
-        @csrf
-        <button class="btn btn-danger">Logout</button>
-        </form> 
+            @csrf
+            <button class="btn btn-danger">Logout</button>
+        </form>
+    </div>
 
-        </div>
+</div>
 
-    <form method="GET" class="my-3">
+<!-- TABLE -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @forelse($businesses as $business)
+            <tr>
+                <td>{{ $business->id }}</td>
+                <td>{{ $business->name }}</td>
+                <td>{{ $business->type }}</td>
+                <td>{{ $business->description }}</td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="4" class="text-center">No data</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
+
+<!-- BOTTOM RIGHT CONTROLS -->
+<div class="d-flex justify-content-end align-items-center gap-3 mt-3">
+
+    <!-- PAGE SIZE -->
+    <form method="GET">
         <select name="per_page" onchange="this.form.submit()" class="form-select w-auto">
             <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
             <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
@@ -31,33 +74,12 @@
         </select>
     </form>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Description</th>
-            </tr>
-        </thead>
+    <!-- PAGINATION -->
+    <div>
+        {{ $businesses->links() }}
+    </div>
 
-        <tbody>
-            @forelse($businesses as $business)
-                <tr>
-                    <td>{{ $business->id }}</td>
-                    <td>{{ $business->name }}</td>
-                    <td>{{ $business->type }}</td>
-                    <td>{{ $business->description }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">No data</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    {{ $businesses->links() }}
+</div>
 
 </div>
 

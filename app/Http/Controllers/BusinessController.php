@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddBusiness;
 use App\Models\Business;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class BusinessController extends Controller
@@ -13,32 +14,36 @@ class BusinessController extends Controller
 
     public function __construct()
     {
-        Log::channel('daily')->info('AuthController initialized');
+        Log::channel('daily');
     }
 
-    public function createBusiness(AddBusiness $request)
+    public function createBusiness(Request $request)
     {
     try
         {
-           $user = auth()->id();
-
-            $existing = Business::where('user_id', $user)
-            ->where('name', $request->name)
-            ->where('type', $request->type)
-            ->where('description', $request->description)
-            ->first()
-            ->latest();
-
-            $createBusiness = Business::createOrUpdate([
-                'user_id' => $user,
-                'name' => $request->name,
-                'type' => $request->type
-            ],[
-                'name' => $request->name,
-                'type' => $request->type,
-                'description' => $request->description
-            ]);
-
+            $request->validate(
+            ['name' => 'required|min:1|max:255',
+            'type' => 'required|min:1|max:255',
+            'description' => 'required|min:6']
+            );
+            $user = auth()->id();
+            $userBusinesses = Business::where('user_id', $user)->whereDate('created_at', Carbon::today())->count();
+            if($userBusinesses >=5){
+                 return response()->json(["Today's Website Generation Using AI Limit exceeeds.Please try again in 24 hours."]);
+            }
+    
+           $apiKey = config('app.generative_ai.api_key');
+            $apiUrl =config('app.generative_ai.url');
+            $url =$apiUrl.'?key='.$apiKey;
+            $response = Http::post(
+                $url,
+                [
+                    "contents"=> [
+                        [   
+                            "parts"=> [           [
+                            "text"=> "Generate website title, tagline, about section and services for a ".$request->type." business named ".$request->name. " .Description: ". $request->description."."
+                ]]]]]
+            );
 
             return redirect('/dashboard')->with('success', 'Website request Added Successfully.');
         }catch (Exception $e) 
@@ -71,9 +76,6 @@ class BusinessController extends Controller
             ])
             ->orderBy('businesses.id', 'desc')
             ->paginate($perPage);
-
-        \Log::info('Businesses fetched', ['count' => $businesses->count()]);
-
         return view('website.dashboard', compact('businesses'));
     }
 }
