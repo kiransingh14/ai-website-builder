@@ -43,16 +43,36 @@
             <th>Name</th>
             <th>Type</th>
             <th>Description</th>
+            <th>Website status</th>
+            <th>View </th>
+            <th>Download</th>
         </tr>
     </thead>
 
     <tbody>
-        @forelse($businesses as $business)
+        @php $count = 1; @endphp
+        @forelse($businesses as  $business)
             <tr>
-                <td>{{ $business->id }}</td>
+                <td>{{ $count++ }}</td>
                 <td>{{ $business->name }}</td>
                 <td>{{ $business->type }}</td>
                 <td>{{ $business->description }}</td>
+                <td>{{ $business->status }}</td>
+                <td>
+                    <a href="{{ url('/website/'.$business->website_id) }}" class="btn btn-primary">
+                        View
+                    </a>
+                </td> 
+                <td>
+                    <a href="{{ url('/website/download/'.$business->website_id) }}" class="btn btn-primary">
+                        Download
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ url('/business/delete/'.$business->id) }}" class="btn btn-danger">
+                        Delete
+                    </a>
+                </td>
             </tr>
         @empty
             <tr>

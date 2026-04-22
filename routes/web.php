@@ -17,7 +17,9 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', [BusinessController::class, 'index']);
     Route::post('/addBusinessDetails', [BusinessController::class, 'createBusiness']);
     Route::get('/addBusinessDetails',fn() => view('website.add-business'))->name('add-business');
-
+    Route::get('/website/{id}', [BusinessController::class, 'getWebsite']);
+    Route::get('/website/download/{id}', [BusinessController::class, 'downloadWebContent']);
+    Route::get('/business/delete/{id}', [BusinessController::class, 'deleteBusiness']);
 });
 
 Route::fallback(function (Request $request) {

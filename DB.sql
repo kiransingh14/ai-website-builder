@@ -18,6 +18,7 @@ CREATE TABLE businesses (
     name VARCHAR(255) NOT NULL,
     type VARCHAR(255) NOT NULL,
     description TEXT NULL,
+    status ENUM('failed', 'success') DEFAULT null,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_business_user
@@ -33,7 +34,7 @@ CREATE TABLE websites (
     tagline VARCHAR(255) NOT NULL,
     about_section TEXT NOT NULL,
     services JSON NULL,
-    slug VARCHAR(255) NOT NULL UNIQUE,
+    slug longtext NOT NULL,
     status ENUM('draft', 'published') DEFAULT 'draft',
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
