@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +15,7 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        Log::channel('daily')->info('AuthController initialized');
+        Log::channel('daily');
     }
 
     public function register(RegisterRequest $request)
@@ -28,9 +28,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             ]);
 
-            $token = $user->createToken('api-token')->plainTextToken;
-
-            return redirect('/login')->with('success', 'Registered successfully');
+            return redirect()->route('login')->with('success', 'Registered successfully');
         }catch (Exception $e) 
         {
             Log::error('Register failed', [
@@ -45,28 +43,25 @@ class AuthController extends Controller
         }
     }
 
-    public function login(LoginRequest $request)
+    public function login(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors(['message' => 'Invalid credentials']);
         }
 
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token
-        ]);
+        $request->session()->regenerate();
+        return redirect('/dashboard')->with('success', 'Logged In successfully');
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        Auth::logout();
 
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }

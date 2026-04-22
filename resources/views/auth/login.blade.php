@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Login</title>
@@ -10,53 +11,51 @@
     <div class="row justify-content-center">
         <div class="col-md-5">
 
-            <h3>Login</h3>
+        <h3>Login</h3>
 
-            <div id="msg"></div>
+        {{-- Success Message --}}
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
-            <form id="loginForm">
+        {{-- Error Message --}}
+        @if($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-                <input type="email" name="email" class="form-control mb-2" placeholder="Email">
-                <input type="password" name="password" class="form-control mb-2" placeholder="Password">
+        <form method="POST" action="/login">
+            @csrf
 
-                <button class="btn btn-success w-100">Login</button>
+            <input 
+                type="email" 
+                name="email" 
+                class="form-control mb-2" 
+                placeholder="Email" 
+                required
+            >
 
-            </form>
+            <input 
+                type="password" 
+                name="password" 
+                class="form-control mb-2" 
+                placeholder="Password" 
+                required
+            >
 
-        </div>
+            <button class="btn btn-success w-100">
+                Login
+            </button>
+        </form>
+
     </div>
 </div>
 
-<script>
-document.getElementById('loginForm').addEventListener('submit', async function(e){
-    e.preventDefault();
 
-    let formData = {
-        email: this.email.value,
-        password: this.password.value
-    };
-
-   let res = await fetch('/api/login', {
-    method: 'POST',
-    credentials: 'omit',
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    },
-    body: JSON.stringify(formData)
-    });
-    let data = await res.json();
-
-    if(res.ok){
-        document.getElementById('msg').innerHTML =
-            `<div class="alert alert-success">Login Successful</div>`;
-        localStorage.setItem('token', data.token);
-    } else {
-        document.getElementById('msg').innerHTML =
-            `<div class="alert alert-danger">${data.message}</div>`;
-    }
-});
-</script>
+</div>
 
 </body>
 </html>
