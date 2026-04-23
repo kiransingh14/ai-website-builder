@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BusinessRequest;
 use App\Models\Business;
 use App\Models\Website;
 use Carbon\Carbon;
@@ -18,15 +19,10 @@ class BusinessController extends Controller
         Log::channel('daily');
     }
 
-    public function createBusiness(Request $request)
+    public function createBusiness(BusinessRequest $request)
     {
     try
         {
-            $request->validate(
-                ['name' => 'required|min:1|max:255',
-                'type' => 'required|min:1|max:255',
-                'description' => 'required|min:6']
-            );
             $user = auth()->id();
             $userBusinesses = Business::where('user_id', $user)->whereDate('created_at', Carbon::today())->count();
             if($userBusinesses >=5){
