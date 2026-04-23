@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -20,30 +21,28 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-    try
-        {
+        try {
             $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
             ]);
 
-            return redirect()->route('login')->with('success', 'Registered successfully');
-        }catch (Exception $e) 
-        {
+            return redirect()->route('login')
+                ->with('success', 'Registered successfully');
+
+        } catch (\Exception $e) {
+
             Log::error('Register failed', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'message' => $e->getMessage()
             ]);
 
-            return response()->json([
-                'message' => 'Something went wrong'
-            ], 500);
+            return redirect()->back()
+                ->with('error', 'Something went wrong');
         }
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
 
