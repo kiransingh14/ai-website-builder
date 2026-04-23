@@ -9,7 +9,19 @@
 <body>
 
 <div class="container mt-4">
+  {{-- Success Message --}}
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
+        {{-- Error Message --}}
+        @if($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first() }}
+            </div>
+        @endif
 <!-- CENTER -->
     <div class="text-center flex-grow-1">
         <h3 class="mb-0">My Businesses</h3>
